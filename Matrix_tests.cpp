@@ -10,7 +10,7 @@ using namespace std;
 // -----
 // Fills a 3x5 Matrix with a value and checks
 // that Matrix_at returns that value for each element.
-TEST(test_fill_basic)
+TEST(test1)
 {
     Matrix mat;
     const int width = 3;
@@ -26,7 +26,7 @@ TEST(test_fill_basic)
             ASSERT_EQUAL(*Matrix_at(&mat, r, c), value);
         }
     }
-
+    
     Matrix_fill_border(&mat, 24);
     cout << endl;
     Matrix_print(&mat, cout);

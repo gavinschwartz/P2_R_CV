@@ -90,7 +90,7 @@ static int squared_difference(Pixel p1, Pixel p2)
 //           See the project spec for details on computing the energy matrix.
 void compute_energy_matrix(const Image *img, Matrix *energy)
 {
-    Matrix_init(energy, img->width, img->height);
+    Matrix_init(energy, Image_width(img), Image_height(img));
     int maxEnergy = 0;
 
     // computing for the interior cells + saving the maximum energy
@@ -98,8 +98,11 @@ void compute_energy_matrix(const Image *img, Matrix *energy)
     {
         for (int c = 1; c < energy->width - 1; c++)
         {
-            int e = squared_difference(Image_get_pixel(img, r - 1, c), Image_get_pixel(img, r + 1, c)) +
-                    squared_difference(Image_get_pixel(img, r, c - 1), Image_get_pixel(img, r, c + 1));
+            int e;
+            e = squared_difference(Image_get_pixel(img, r - 1, c),
+                                    Image_get_pixel(img, r + 1, c))
+                + squared_difference(Image_get_pixel(img, r, c - 1), 
+                                        Image_get_pixel(img, r, c + 1));
             if (e > maxEnergy)
             {
                 maxEnergy = e;
@@ -139,7 +142,8 @@ void compute_vertical_cost_matrix(const Matrix *energy, Matrix *cost)
     {
         *Matrix_at(cost, 0, c) = *Matrix_at(energy, 0, c);
     }
-    // the cost is equal to the energy + minimum cost of its northern neighbors (for rows after the first row)
+    // the cost is equal to the energy + minimum cost of its northern neighbors
+    // (for rows after the first row)
     for (int r = 1; r < energy->height; r++)
     {
         for (int c = 0; c < energy->width; c++)
@@ -177,7 +181,8 @@ vector<int> find_minimal_vertical_seam(const Matrix *cost)
     vector<int> seam = vector<int>(cost->height);
 
     // start with the column with the minimum cost in the bottom row
-    int c = Matrix_column_of_min_value_in_row(cost, cost->height - 1, 0, cost->width);
+    int c = Matrix_column_of_min_value_in_row(cost, 
+                                            cost->height - 1, 0, cost->width);
 
     // computing the cost from the bottom row up
     for (int i = cost->height - 1; i > 0; i--)
@@ -185,7 +190,8 @@ vector<int> find_minimal_vertical_seam(const Matrix *cost)
         seam[i] = c;
         int leftNeighbor = c == 0 ? 0 : c - 1;
         int rightNeighbor = c == cost->width - 1 ? c : c + 1;
-        c = Matrix_column_of_min_value_in_row(cost, i - 1, leftNeighbor, rightNeighbor + 1);
+        c = Matrix_column_of_min_value_in_row(cost, 
+                                        i - 1, leftNeighbor, rightNeighbor + 1);
     }
     seam[0] = c;
 

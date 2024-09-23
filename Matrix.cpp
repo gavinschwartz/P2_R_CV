@@ -172,9 +172,9 @@ int Matrix_column_of_min_value_in_row(const Matrix *mat, int row,
 //           is defined as elements in the given row and between
 //           column_start (inclusive) and column_end (exclusive).
 int Matrix_min_value_in_row(const Matrix *mat, int row,
-                            int column_start, int column_end)
+                            int col_start, int col_end)
 {
-    int minimum_colum = Matrix_column_of_min_value_in_row(mat, row, column_start, column_end);
+    int min_column = Matrix_column_of_min_value_in_row(mat, row, col_start, col_end);
 
-    return *Matrix_at(mat, row, minimum_colum);
+    return *Matrix_at(mat, row, min_column);
 }
