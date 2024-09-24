@@ -107,6 +107,51 @@ TEST(test_init)
         }
     }
 }
+TEST(testImageGetPixel){
+    Image img;
+    Image_init(&img, 3, 5);
+    Pixel right;
+    Pixel change;
+    right.r = 255;
+    right.g = 255;
+    right.b = 255;
+    change.r = 0;
+    change.g = 67;
+    change.b = 240;
+    Image_fill(&img, right);
+    ASSERT_TRUE(Pixel_equal(Image_get_pixel(&img, 4, 2), right));
+    Image_set_pixel(&img, 3, 1, change);
+    ASSERT_TRUE(Pixel_equal(Image_get_pixel(&img, 3, 1), change));
+}
+TEST(testImageSetPixel) {
+    Image img;
+    Image_init(&img, 3, 5);
+    Pixel white;
+    Pixel color;
+    white.r = 0;
+    white.g = 0;
+    white.b = 0;
+    color.r = 255;
+    color.g = 255;
+    color.b = 255;
+    Image_fill(&img, white);
+    Image_set_pixel(&img, 2, 1, color);
+    ASSERT_TRUE(Pixel_equal(Image_get_pixel(&img, 2, 1), color));
+}
+TEST(test_image_fill){
+    Image img;
+    Image_init(&img, 3, 5);
+    Pixel fill;
+    fill.r = 0;
+    fill.g = 200;
+    fill.b = 50;
+    Image_fill(&img, fill);
+    for (int r = 0; r < 5; ++r) {
+        for ( int c = 0; c < 3; ++c) {
+            ASSERT_TRUE(Pixel_equal(Image_get_pixel(&img, r, c), fill));
+        }
+    }
+}
 
 // IMPLEMENT YOUR TEST FUNCTIONS HERE
 // You are encouraged to use any functions from Image_test_helpers.hpp as needed.

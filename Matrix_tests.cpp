@@ -43,5 +43,74 @@ TEST(test1)
 
     ASSERT_EQUAL(Matrix_min_value_in_row(&mat, 1, 0, 1), 24);
 }
-
+TEST(test_matrix_print){
+    Matrix mat;
+    Matrix_init(&mat, 1, 1);
+    *Matrix_at(&mat, 0, 0) = 42;
+    ostringstream expected;
+    expected << "1 1\n"
+             << "42 \n";
+    ostringstream actual;
+    Matrix_print(&mat, actual);
+    ASSERT_EQUAL(expected.str(), actual.str());
+}
+TEST(test_matrix_init){
+    Matrix mat1, mat2;
+    Matrix_init(&mat1, 1, 1);
+    Matrix_init(&mat2, 10, 100);
+    ASSERT_EQUAL(Matrix_width(&mat1), 1);
+    ASSERT_EQUAL(Matrix_height(&mat1), 1);
+    ASSERT_EQUAL(Matrix_width(&mat2), 10);
+    ASSERT_EQUAL(Matrix_height(&mat2), 100);
+}
+TEST(test_matrix_at){
+    Matrix mat;
+    Matrix_init(&mat,5, 3);
+    Matrix_fill(&mat, 10);
+    Matrix_fill_border(&mat, 42);
+    ASSERT_EQUAL(*Matrix_at(&mat, 1, 1), 10);
+    ASSERT_EQUAL(*Matrix_at(&mat, 0, 0), 42);
+    ASSERT_EQUAL(*Matrix_at(&mat, 2, 2), 42);
+}
+TEST(test_matrix_fill_border){
+    Matrix mat;
+    Matrix_init(&mat, 3, 5);
+    Matrix_fill(&mat, 10);
+    Matrix_fill_border(&mat, 42);
+    for (size_t r = 0; r < Matrix_height(&mat); r++){
+        ASSERT_EQUAL(*Matrix_at(&mat, r, 0), 42);
+        ASSERT_EQUAL(*Matrix_at(&mat, r, 2), 42);
+        }
+    
+    for (size_t c = 0; c < Matrix_width(&mat); c++){
+        ASSERT_EQUAL(*Matrix_at(&mat, 0, c), 42);
+        ASSERT_EQUAL(*Matrix_at(&mat, 4, c), 42);
+        }
+}
+TEST(test_matrix_max){
+    Matrix mat;
+    Matrix_init(&mat, 3, 5);
+    Matrix_fill(&mat, 10);
+    *Matrix_at(&mat, 4, 2) = 11;
+    ASSERT_EQUAL(Matrix_max(&mat), 11);
+    Matrix_fill(&mat, -6);
+    Matrix_fill_border(&mat, -2);
+    ASSERT_EQUAL(Matrix_max(&mat), -2);
+}
+TEST(test_matrix_column_of_min_value_in_row){
+    Matrix mat;
+    Matrix_init(&mat, 3, 5);
+    Matrix_fill(&mat, 10);
+    ASSERT_EQUAL(Matrix_column_of_min_value_in_row(&mat, 3, 0, 2), 0);
+    Matrix_fill_border(&mat, 50);
+    ASSERT_EQUAL(Matrix_column_of_min_value_in_row(&mat, 3, 0, 2), 1);
+}
+TEST(test_matrix_min_value_in_row) {
+    Matrix mat;
+    Matrix_init(&mat, 3, 5);
+    Matrix_fill(&mat, 10);
+    ASSERT_EQUAL(Matrix_min_value_in_row(&mat, 3, 0, 2), 10);
+    Matrix_fill_border(&mat, 5);
+    ASSERT_EQUAL(Matrix_min_value_in_row(&mat, 3, 0, 2), 5);
+}
 TEST_MAIN() // Do NOT put a semicolon here
