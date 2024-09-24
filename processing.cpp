@@ -180,18 +180,18 @@ void compute_vertical_cost_matrix(const Matrix *energy, Matrix *cost)
 //           See the project spec for details on computing the minimal seam.
 vector<int> find_minimal_vertical_seam(const Matrix *cost)
 {
-    vector<int> seam = vector<int>(cost->height);
+    vector<int> seam = vector<int>(Matrix_height(cost));
 
     // start with the column with the minimum cost in the bottom row
     int c = Matrix_column_of_min_value_in_row(cost, 
-                                            cost->height - 1, 0, cost->width);
+                                            Matrix_height(cost) - 1, 0, Matrix_width(cost));
 
     // computing the cost from the bottom row up
-    for (int i = cost->height - 1; i > 0; i--)
+    for (int i = Matrix_height(cost) - 1; i > 0; i--)
     {
         seam[i] = c;
         int leftNeighbor = c == 0 ? 0 : c - 1;
-        int rightNeighbor = c == cost->width - 1 ? c : c + 1;
+        int rightNeighbor = c == Matrix_width(cost) - 1 ? c : c + 1;
         c = Matrix_column_of_min_value_in_row(
             cost, i - 1, leftNeighbor, rightNeighbor + 1);
     }

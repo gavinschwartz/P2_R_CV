@@ -16,9 +16,9 @@ TEST(test1)
     const int width = 3;
     const int height = 5;
     const int value = 42;
-    Matrix_init(&mat, 3, 5);
-    ASSERT_EQUAL(Matrix_width(&mat), 5);
-    ASSERT_EQUAL(Matrix_height(&mat), 3);
+    Matrix_init(&mat, width, height);
+    ASSERT_EQUAL(Matrix_width(&mat), width);
+    ASSERT_EQUAL(Matrix_height(&mat), height);
     Matrix_fill(&mat, value);
 
     for (int r = 0; r < height; ++r)
@@ -35,7 +35,7 @@ TEST(test1)
 
     Matrix_print(&mat, output);
 
-    string expected = string("3 5 \n24 24 24 \n24 42 24 \n24 42 24 \n24 42 24 \n24 24 24 ");
+    string expected = "3 5\n24 24 24 \n24 42 24 \n24 42 24 \n24 42 24 \n24 24 24 \n";
     ASSERT_EQUAL(output.str(), expected);
 
     const int c = *Matrix_at(&mat, 0, 0);
