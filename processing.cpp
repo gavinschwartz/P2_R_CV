@@ -183,7 +183,8 @@ vector<int> find_minimal_vertical_seam(const Matrix *cost)
     vector<int> seam = vector<int>(cost->height);
 
     // start with the column with the minimum cost in the bottom row
-    int c = Matrix_column_of_min_value_in_row(cost, cost->height - 1, 0, cost->width);
+    int c = Matrix_column_of_min_value_in_row(cost, 
+                                            cost->height - 1, 0, cost->width);
 
     // computing the cost from the bottom row up
     for (int i = cost->height - 1; i > 0; i--)
