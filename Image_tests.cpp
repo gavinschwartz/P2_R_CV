@@ -23,6 +23,8 @@ TEST(test_print_basic)
     const Pixel white = {255, 255, 255};
 
     Image_init(&img, 2, 2);
+    ASSERT_EQUAL(Image_width(&img), 2);
+    ASSERT_EQUAL(Image_height(&img), 2);
     Image_set_pixel(&img, 0, 0, red);
     Image_set_pixel(&img, 0, 1, green);
     Image_set_pixel(&img, 1, 0, blue);
@@ -30,7 +32,11 @@ TEST(test_print_basic)
 
     // Capture our output
     ostringstream s;
+
+    string expected = "P3\n2 2\n255\n255 0 0 0 255 0 \n0 0 255 255 255 255 \n";
     Image_print(&img, s);
+    // Image_print(&img,cout);
+    ASSERT_EQUAL(expected, s.str());
 
     // Correct output
     ostringstream correct;

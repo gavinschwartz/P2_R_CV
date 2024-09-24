@@ -90,16 +90,20 @@ static int squared_difference(Pixel p1, Pixel p2)
 //           See the project spec for details on computing the energy matrix.
 void compute_energy_matrix(const Image *img, Matrix *energy)
 {
-    Matrix_init(energy, img->width, img->height);
+    Matrix_init(energy, Image_width(img), Image_height(img));
     int maxEnergy = 0;
 
     // computing for the interior cells + saving the maximum energy
-    for (int r = 1; r < energy->height - 1; r++)
+    for (int r = 1; r < Matrix_height(energy) - 1; r++)
     {
-        for (int c = 1; c < energy->width - 1; c++)
+        for (int c = 1; c < Matrix_width(energy) - 1; c++)
         {
-            int e = squared_difference(Image_get_pixel(img, r - 1, c), Image_get_pixel(img, r + 1, c)) +
-                    squared_difference(Image_get_pixel(img, r, c - 1), Image_get_pixel(img, r, c + 1));
+            int e = squared_difference(
+                        Image_get_pixel(img, r - 1, c),
+                        Image_get_pixel(img, r + 1, c)) +
+                    squared_difference(
+                        Image_get_pixel(img, r, c - 1),
+                        Image_get_pixel(img, r, c + 1));
             if (e > maxEnergy)
             {
                 maxEnergy = e;
@@ -109,11 +113,12 @@ void compute_energy_matrix(const Image *img, Matrix *energy)
     }
 
     // set the boarder cells equal to maximum energy
-    for (int r = 0; r < energy->height; r++)
+    for (int r = 0; r < Matrix_height(energy); r++)
     {
-        for (int c = 0; c < energy->width; c++)
+        for (int c = 0; c < Matrix_width(energy); c++)
         {
-            if (r == 0 || c == 0 || r == energy->height - 1 || c == energy->width - 1)
+            if (r == 0 || c == 0 ||
+                r == Matrix_height(energy) - 1 || c == Matrix_width(energy) - 1)
             {
                 *Matrix_at(energy, r, c) = maxEnergy;
             }
@@ -132,17 +137,18 @@ void compute_energy_matrix(const Image *img, Matrix *energy)
 //           See the project spec for details on computing the cost matrix.
 void compute_vertical_cost_matrix(const Matrix *energy, Matrix *cost)
 {
-    Matrix_init(cost, energy->width, energy->height);
+    Matrix_init(cost, Matrix_width(energy), Matrix_height(energy));
 
     // for the first row, the cost is equal to the energy
-    for (int c = 0; c < energy->width; c++)
+    for (int c = 0; c < Matrix_width(energy); c++)
     {
         *Matrix_at(cost, 0, c) = *Matrix_at(energy, 0, c);
     }
-    // the cost is equal to the energy + minimum cost of its northern neighbors (for rows after the first row)
-    for (int r = 1; r < energy->height; r++)
+    // the cost is equal to the energy + minimum cost of its northern neighbors
+    // (for rows after the first row)
+    for (int r = 1; r < Matrix_height(energy); r++)
     {
-        for (int c = 0; c < energy->width; c++)
+        for (int c = 0; c < Matrix_width(energy); c++)
         {
             int minimum = 100000000;
 
@@ -154,7 +160,7 @@ void compute_vertical_cost_matrix(const Matrix *energy, Matrix *cost)
             {
                 minimum = *Matrix_at(cost, r - 1, c);
             }
-            if (c != energy->width - 1 && *Matrix_at(cost, r - 1, c + 1) < minimum)
+            if (c != Matrix_width(energy) - 1 && *Matrix_at(cost, r - 1, c + 1) < minimum)
             {
                 minimum = *Matrix_at(cost, r - 1, c + 1);
             }
@@ -185,7 +191,8 @@ vector<int> find_minimal_vertical_seam(const Matrix *cost)
         seam[i] = c;
         int leftNeighbor = c == 0 ? 0 : c - 1;
         int rightNeighbor = c == cost->width - 1 ? c : c + 1;
-        c = Matrix_column_of_min_value_in_row(cost, i - 1, leftNeighbor, rightNeighbor + 1);
+        c = Matrix_column_of_min_value_in_row(
+            cost, i - 1, leftNeighbor, rightNeighbor + 1);
     }
     seam[0] = c;
 
@@ -208,10 +215,10 @@ void remove_vertical_seam(Image *img, const vector<int> &seam)
 {
     // create and initialize a temporary image that is one pixel narrower
     Image tempImage;
-    Image_init(&tempImage, img->width - 1, img->height);
+    Image_init(&tempImage, Image_width(img) - 1, Image_height(img));
 
     // copy all pixels except for vertical seam from img to tempImage
-    for (int r = 0; r < img->height; r++)
+    for (int r = 0; r < Image_height(img); r++)
     {
         // copy pixels before the seam into tempImage
         for (int c = 0; c < seam[r]; c++)
@@ -221,7 +228,7 @@ void remove_vertical_seam(Image *img, const vector<int> &seam)
         }
 
         // copy pixels after the seam into tempImage
-        for (int c = seam[r] + 1; c < img->width; c++)
+        for (int c = seam[r] + 1; c < Image_width(img); c++)
         {
             Pixel p = Image_get_pixel(img, r, c);
             Image_set_pixel(&tempImage, r, c - 1, p);
@@ -229,12 +236,12 @@ void remove_vertical_seam(Image *img, const vector<int> &seam)
     }
 
     // resize the original image to be one pixel narrower
-    Image_init(img, img->width - 1, img->height);
+    Image_init(img, Image_width(img) - 1, Image_height(img));
 
     // copy all pixels from tempImage into Image
-    for (int r = 0; r < img->height; r++)
+    for (int r = 0; r < Image_height(img); r++)
     {
-        for (int c = 0; c < img->width; c++)
+        for (int c = 0; c < Image_width(img); c++)
         {
             Pixel p = Image_get_pixel(&tempImage, r, c);
             Image_set_pixel(img, r, c, p);
@@ -252,12 +259,12 @@ void remove_vertical_seam(Image *img, const vector<int> &seam)
 //           the underlying array.
 void seam_carve_width(Image *img, int newWidth)
 {
-    int numberOfColumnsToRemove = img->width - newWidth;
+    int numberOfColumnsToRemove = Image_width(img) - newWidth;
 
     Matrix energy, cost;
 
-    Matrix_init(&energy, img->width, img->height);
-    Matrix_init(&cost, img->width, img->height);
+    Matrix_init(&energy, Image_width(img), Image_height(img));
+    Matrix_init(&cost, Image_width(img), Image_height(img));
 
     // repeatedly removing vertical seams
 

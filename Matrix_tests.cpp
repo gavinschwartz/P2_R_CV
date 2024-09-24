@@ -17,6 +17,8 @@ TEST(test_fill_basic)
     const int height = 5;
     const int value = 42;
     Matrix_init(&mat, 3, 5);
+    ASSERT_EQUAL(Matrix_width(&mat), 5);
+    ASSERT_EQUAL(Matrix_height(&mat), 3);
     Matrix_fill(&mat, value);
 
     for (int r = 0; r < height; ++r)
@@ -29,14 +31,22 @@ TEST(test_fill_basic)
 
     Matrix_fill_border(&mat, 24);
     cout << endl;
-    Matrix_print(&mat, cout);
+    ostringstream output;
+
+    Matrix_print(&mat, output);
+
+    string expected = string("3 5 \n24 24 24 \n24 42 24 \n24 42 24 \n24 42 24 \n24 24 24 ");
+    ASSERT_EQUAL(output.str(), expected);
+
+    const int c = *Matrix_at(&mat, 0, 0);
+    ASSERT_EQUAL(c, 24);
 
     ASSERT_EQUAL(*Matrix_at(&mat, 0, 0), 24);
     ASSERT_EQUAL(*Matrix_at(&mat, 4, 2), 24);
     ASSERT_EQUAL(*Matrix_at(&mat, 1, 1), 42);
 
     *Matrix_at(&mat, 3, 2) = 43;
-    
+
     ASSERT_EQUAL(Matrix_max(&mat), 43);
 
     ASSERT_EQUAL(Matrix_column_of_min_value_in_row(&mat, 1, 0, 1), 0);
